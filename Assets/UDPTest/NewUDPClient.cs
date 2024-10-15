@@ -1,19 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 
 public class NewUDPClient : MonoBehaviour
 {
 
     public static NewUDPClient instance;
     //服务端的IP
-    public string UDPClientIP;
+    private string UDPClientIP;
     //目标socket 
     Socket socket;
     //服务端 
@@ -56,11 +54,33 @@ public class NewUDPClient : MonoBehaviour
 
     void Start()
     {
-        //UDPClientIP = "192.168.1.159";//服务端的IP.自己更改
+        UDPClientIP = GetPlayerIp();//服务端的IP.自己更改
+        UnityEngine.Debug.Log(UDPClientIP);
         //port = 7788;
         UDPClientIP = UDPClientIP.Trim();
         isClientActive = true;
         InitSocket(); //在这里初始化
+    }
+
+
+    /// <summary>
+    /// 获取本机IP
+    /// </summary>
+    /// <returns>string :ip地址</returns>
+        public static string GetPlayerIp()
+   {        
+ 
+        IPAddress[] ips = Dns.GetHostAddresses(Dns.GetHostName());
+        for (int i = 0; i<ips.Length; i++)
+        {
+            IPAddress address = ips[i];
+            if (address.AddressFamily == AddressFamily.InterNetwork)
+            {
+                return address.ToString();//返回ipv4的地址的字符串
+            }
+        }
+        //找不到就返回本地
+        return "127.0.0.1";
     }
 
     private void Update()

@@ -13,6 +13,7 @@ public class PaintBrush : MonoBehaviour
     private float brushScale = 0.01f;
     public Color brushColor = Color.black;
     public RawImage raw;                   //使用UGUI的RawImage显示，方便进行添加UI,将pivot设为(0.5,0.5)
+    public float LineWidth=1;//笔锋宽度
     private float lastDistance;
     private Vector3[] PositionArray = new Vector3[3];
     private int a = 0;
@@ -31,14 +32,14 @@ public class PaintBrush : MonoBehaviour
     void Awake()
     {
         Inst = this;
-        float screenScale = Screen.width / 2048f;
+        //float screenScale = Screen.width / 2048f;
         var rectrf = raw.GetComponent<RectTransform>();
         //raw图片鼠标位置，宽度计算
-        rawWidth = rectrf.sizeDelta.x * screenScale;
-        rawHeight = rectrf.sizeDelta.y * screenScale;
+        rawWidth = rectrf.rect.width;
+        rawHeight = rectrf.rect.height;
 
         //这边直接写死了 正常应该用显示签名的image.pos.x减屏幕的宽的一半  image.pos.y 减屏幕的高的一半 
-        Vector2 rawanchorPositon = new Vector2(-rawWidth * 0.5f, rectrf.anchoredPosition.y * screenScale - rawHeight * 0.5f);
+        Vector2 rawanchorPositon = new Vector2(-rawWidth * 0.5f, rectrf.anchoredPosition.y - rawHeight * 0.5f);
         rawMousePosition = rawanchorPositon + new Vector2(Screen.width / 2.0f, Screen.height / 2.0f);
         texRender = RenderTexture.GetTemporary((int)rawWidth, (int)rawHeight, 24);
         raw.texture = texRender;
@@ -266,7 +267,7 @@ public class PaintBrush : MonoBehaviour
                 //float randomOffset = Random.Range(-1/(speedArray[0] + (deltaspeed * index1)), 1 / (speedArray[0] + (deltaspeed * index1)));
                 //模拟毛刺效果
                 float randomOffset = Random.Range(-targetPosOffset, targetPosOffset);
-                DrawBrush(texRender, (int)(target.x), (int)(target.y), brushTypeTexture, brushColor, SetScale(speedArray[0] + (deltaspeed * index1)));
+                DrawBrush(texRender, (int)(target.x), (int)(target.y), brushTypeTexture, brushColor, LineWidth*SetScale(speedArray[0] + (deltaspeed * index1)));
             }
 
             PositionArray1[0] = temp1;
@@ -282,7 +283,7 @@ public class PaintBrush : MonoBehaviour
         else
         {
             DrawBrush(texRender, (int)endPosition.x, (int)endPosition.y, brushTypeTexture,
-                brushColor, brushScale);
+                brushColor, LineWidth * brushScale);
         }
 
     }
