@@ -1,4 +1,5 @@
 using Framework.Utility;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -32,6 +33,30 @@ public class PaintBrush : MonoBehaviour
     void Awake()
     {
         Inst = this;
+        
+        UIEvent.Get<UIDrag>(raw.gameObject).BeginDrag = OnBeginDrag;
+        UIEvent.Get<UIDrag>(raw.gameObject).Drag = OnDrag;
+        UIEvent.Get<UIDrag>(raw.gameObject).EndDrag = EndDrag;
+        OnSwitchScreen(false);
+    }
+
+
+    public void OnSwitchScreen(bool isVertical) {
+
+        if (isVertical)
+        {
+            Screen.orientation = ScreenOrientation.Portrait;
+        }
+        else
+        {
+            Screen.orientation = ScreenOrientation.LandscapeLeft;
+        }
+        StartCoroutine(RefreshScreen());
+    }
+
+    private IEnumerator RefreshScreen() {
+
+        yield return new WaitForSeconds(0.5f);
         //float screenScale = Screen.width / 2048f;
         var rectrf = raw.GetComponent<RectTransform>();
         //raw图片鼠标位置，宽度计算
@@ -43,11 +68,10 @@ public class PaintBrush : MonoBehaviour
         rawMousePosition = rawanchorPositon + new Vector2(Screen.width / 2.0f, Screen.height / 2.0f);
         texRender = RenderTexture.GetTemporary((int)rawWidth, (int)rawHeight, 24);
         raw.texture = texRender;
-        UIEvent.Get<UIDrag>(raw.gameObject).BeginDrag = OnBeginDrag;
-        UIEvent.Get<UIDrag>(raw.gameObject).Drag = OnDrag;
-        UIEvent.Get<UIDrag>(raw.gameObject).EndDrag = EndDrag;
         Clear(texRender);
+
     }
+
     Vector3 startPosition = Vector3.zero;
     Vector3 endPosition = Vector3.zero;
     private bool _canDrag = false;

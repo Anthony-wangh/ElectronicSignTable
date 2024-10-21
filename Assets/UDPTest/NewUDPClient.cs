@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Diagnostics;
+using System;
 
 public class NewUDPClient : MonoBehaviour
 {
@@ -46,6 +45,8 @@ public class NewUDPClient : MonoBehaviour
     public delegate void ReSendIndexDeledate(string str);
     public event ReSendIndexDeledate ReSendIndexEvent;
 
+    //是否正在连接状态
+    public bool IsConnected = false;
 
     private void Awake()
     {
@@ -54,21 +55,27 @@ public class NewUDPClient : MonoBehaviour
 
     void Start()
     {
-        UDPClientIP = GetPlayerIp();//服务端的IP.自己更改
-        UnityEngine.Debug.Log(UDPClientIP);
-        //port = 7788;
-        UDPClientIP = UDPClientIP.Trim();
-        isClientActive = true;
-        InitSocket(); //在这里初始化
+        EventManager.Instance.AddListener("LoginEvent", Login);        
     }
 
+    private void Login(object sender, EventArgs e)
+    {
+        LoginEventArgs args = (LoginEventArgs)e;
+        if (args != null)
+        {
+            UDPClientIP = args.IPText;
+            UDPClientIP = UDPClientIP.Trim();
+            isClientActive = true;
+            InitSocket(); 
+        }
+    }
 
     /// <summary>
     /// 获取本机IP
     /// </summary>
     /// <returns>string :ip地址</returns>
-        public static string GetPlayerIp()
-   {        
+    public static string GetPlayerIp()
+    {        
  
         IPAddress[] ips = Dns.GetHostAddresses(Dns.GetHostName());
         for (int i = 0; i<ips.Length; i++)
@@ -85,6 +92,8 @@ public class NewUDPClient : MonoBehaviour
 
     private void Update()
     {
+        if(!isClientActive)
+            return;
         if (isStartHeart)
         {
             HeartSend();
@@ -94,6 +103,7 @@ public class NewUDPClient : MonoBehaviour
 
         if (timerInterval > 6f)
         {
+            IsConnected = false;
             print("连接异常");
             timerInterval = 0f;
         }
@@ -199,6 +209,7 @@ public class NewUDPClient : MonoBehaviour
             //心跳回馈
             if (recvStr == "keeping")
             {
+                IsConnected = true;
                 // 当服务端收到客户端发送的alive消息时
                 print("连接正常");
                 timerInterval = 0;

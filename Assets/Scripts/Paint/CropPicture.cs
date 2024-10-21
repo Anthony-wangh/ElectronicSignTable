@@ -15,7 +15,7 @@ public class CropPicture : MonoBehaviour
     //调试时，保存在工程本地
     public bool DebugTexture = true;
 
-    private string _fileName => Application.dataPath + "/Capture.png";
+    private string _fileName => Application.persistentDataPath + "/Capture.png";
 
     private void Start()
     {

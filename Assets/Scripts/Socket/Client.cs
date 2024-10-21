@@ -19,10 +19,12 @@ public class Client : MonoBehaviour
 
     void Start()
     {
-        EventManager.Instance.AddListener("SendSignToServer", Send);
+        EventManager.Instance.AddListener("SendSignToServer", Send);        
+        
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        clientSocket.BeginConnect(IP, Port, ConnectCallback, null);
     }
+
+    
 
     private void Send(object sender, EventArgs e)
     {
