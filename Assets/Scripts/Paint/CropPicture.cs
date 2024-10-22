@@ -24,6 +24,12 @@ public class CropPicture : MonoBehaviour
 
     public void Send() {
 
+        if (PaintBrush.Inst.ContentIsEmpty) {
+
+            Debug.Log("»­²¼ÄÚÈÝÎª¿Õ£¡£¡");
+            return;
+        }
+
         SignRawImage.texture = PaintBrush.Inst.TexRender;
         _renderTexture = RenderTexture.GetTemporary((int)Size.x, (int)Size.y, 24);
         _texture2D = new Texture2D((int)Size.x, (int)Size.y);

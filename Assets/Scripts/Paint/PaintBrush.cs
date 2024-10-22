@@ -1,4 +1,5 @@
 using Framework.Utility;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -30,6 +31,8 @@ public class PaintBrush : MonoBehaviour
     float rawWidth;                               //rawÍ¼Æ¬¿í¶È
     float rawHeight;                              //rawÍ¼Æ¬³¤¶È
 
+    public bool ContentIsEmpty = true;
+
     void Awake()
     {
         Inst = this;
@@ -38,8 +41,21 @@ public class PaintBrush : MonoBehaviour
         UIEvent.Get<UIDrag>(raw.gameObject).Drag = OnDrag;
         UIEvent.Get<UIDrag>(raw.gameObject).EndDrag = EndDrag;
         OnSwitchScreen(false);
+
+        EventManager.Instance.AddListener("SendSignToServer", OnSend);
     }
 
+
+    private void OnSend(object sender, EventArgs e)
+    {
+        ClientEventArgs args = (ClientEventArgs)e;
+        if (args != null)
+        {
+            if (string.IsNullOrEmpty(args.TexturePath))
+                return;
+            ClickClear();
+        }
+    }
 
     public void OnSwitchScreen(bool isVertical) {
 
@@ -98,6 +114,7 @@ public class PaintBrush : MonoBehaviour
         ThreeOrderB¨¦zierCurse(eventData.position, distance, 1f);
         startPosition = endPosition;
         lastDistance = distance;
+        ContentIsEmpty = false;
     }
 
     private void EndDrag(PointerEventData eventData)
@@ -228,6 +245,7 @@ public class PaintBrush : MonoBehaviour
     }
     public void ClickClear()
     {
+        ContentIsEmpty = true;
         Clear(texRender);
     }
 
