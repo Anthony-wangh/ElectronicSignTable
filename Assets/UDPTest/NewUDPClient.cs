@@ -46,7 +46,7 @@ public class NewUDPClient : MonoBehaviour
     public event ReSendIndexDeledate ReSendIndexEvent;
 
     //是否正在连接状态
-    public bool IsConnected = false;
+    public int ConnectState = -1;
 
     private void Awake()
     {
@@ -103,7 +103,7 @@ public class NewUDPClient : MonoBehaviour
 
         if (timerInterval > 6f)
         {
-            IsConnected = false;
+            ConnectState = 0;
             print("连接异常");
             timerInterval = 0f;
         }
@@ -209,7 +209,7 @@ public class NewUDPClient : MonoBehaviour
             //心跳回馈
             if (recvStr == "keeping")
             {
-                IsConnected = true;
+                ConnectState = 1;
                 // 当服务端收到客户端发送的alive消息时
                 print("连接正常");
                 timerInterval = 0;
